@@ -200,7 +200,7 @@ def main(_):
         evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     with tf.Session() as sess:
-        init = tf.initializer_all_variables()
+        init = tf.global_variables_initializer()
         sess.run(init)
 
         # 训练过程
