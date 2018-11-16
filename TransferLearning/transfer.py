@@ -214,10 +214,10 @@ def main(_):
                 validation_accuracy = sess.run(evaluation_step, feed_dict={bottleneck_input: validation_bottlenecks, ground_truth_input: validation_ground_truth})
                 print 'Step {}: Validation accuracy on random sampled {} examples = {:.1f}'.format(i, BATCH, validation_accuracy * 100)
 
-            # 在最后的测试集上测试正确率
-            test_bottleneck, test_ground_truth = get_test_bottlenecks(sess, image_lists, n_classes, jpeg_data_tensor, bottleneck_tensor)
-            test_accuracy = sess.run(evaluation_step, feed_dict={bottleneck_input: test_bottleneck, ground_truth_input: test_ground_truth})
-            print 'Final test accuracy = {:.1f}'.format(test_accuracy * 100)
+        # 在最后的测试集上测试正确率
+        test_bottleneck, test_ground_truth = get_test_bottlenecks(sess, image_lists, n_classes, jpeg_data_tensor, bottleneck_tensor)
+        test_accuracy = sess.run(evaluation_step, feed_dict={bottleneck_input: test_bottleneck, ground_truth_input: test_ground_truth})
+        print 'Final test accuracy = {:.1f}'.format(test_accuracy * 100)
 
 
 if __name__ == '__main__':
