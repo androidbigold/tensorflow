@@ -210,7 +210,7 @@ def main(_):
 
             # 在验证数据上测试正确率
             if i % 100 == 0 or i + 1 == STEPS:
-                validation_bottlenecks, validation_ground_truth = get_random_cached_bottlenecks(sess, n_classes, BATCH, 'validation', jpeg_data_tensor, bottleneck_tensor)
+                validation_bottlenecks, validation_ground_truth = get_random_cached_bottlenecks(sess, n_classes, image_lists, BATCH, 'validation', jpeg_data_tensor, bottleneck_tensor)
                 validation_accuracy = sess.run(evaluation_step, feed_dict={bottleneck_input: validation_bottlenecks, ground_truth_input: validation_ground_truth})
                 print 'Step {}: Validation accuracy on random sampled {} examples = {:.1f}'.format(i, BATCH, validation_accuracy * 100)
 
