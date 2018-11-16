@@ -57,7 +57,7 @@ def train(mnist):
             reshaped_xs = np.reshape(xs, (BATCH_SIZE, mnist_inference.IMAGE_SIZE, mnist_inference.IMAGE_SIZE, mnist_inference.NUM_CHANNELS))
             _, loss_value, step = sess.run([train_op, loss, global_step], feed_dict={x: reshaped_xs, y_: ys})
 
-            if i % 10 == 0:
+            if i % 1000 == 0:
                 print "After {} training step(s), loss on training batch is {}".format(step, loss_value)
                 # global_step参数会让保存模型的文件名末尾加上训练轮数, 如"model.ckpt-1000"表示训练1000轮之后得到的模型
                 saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=global_step)
