@@ -144,10 +144,10 @@ def get_random_cached_bottlenecks(sess, n_classes, image_lists, how_many, catego
         label_name = list(image_lists.keys())[label_index]
         image_index = random.randrange(65536)
         bottleneck = get_or_create_bottleneck(sess, image_lists, label_name, image_index, category, jpeg_data_tensor, bottleneck_tensor)
-        ground_truths = np.zeros(n_classes, dtype=np.float32)
-        ground_truths[label_index] = 1.0
+        ground_truth = np.zeros(n_classes, dtype=np.float32)
+        ground_truth[label_index] = 1.0
         bottlenecks.append(bottleneck)
-        ground_truths.append(ground_truths)
+        ground_truths.append(ground_truth)
 
     return bottlenecks, ground_truths
 
