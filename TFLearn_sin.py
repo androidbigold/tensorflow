@@ -38,7 +38,7 @@ def lstm_model(X, y):
     output = output[-1]
 
     # 对LSTM网络的输出再加一层全连接层并计算损失(默认为平均平方差损失)
-    prediction, loss = learn.models.linear_regrssion(output, y)
+    prediction, loss = learn.models.linear_regression(output, y)
 
     # 创建模型优化器并得到优化步骤
     train_op = tf.contrib.layers.optimize_loss(loss, tf.contrib.framework.get_global_step(), optimizer="Adagrad", learning_rate=0.1)
