@@ -147,19 +147,29 @@ def main(_):
     with tf.Session() as session:
         tf.global_variables_initializer().run()
 
+        train_queue = reader.ptb_producer(train_data, train_model.batch_size, train_model.num_steps)
+        eval_queue = reader.ptb_producer(valid_data, eval_model.batch_size, eval_model.num_steps)
+        test_queue = reader.ptb_producer(test_data, eval_model.batch_size, eval_model.num_steps)
+
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(sess=session, coord=coord)
+
         # 使用训练数据训练模型
         for i in range(NUM_EPOCH):
             print "In iteration: {}".format(i + 1)
 
-            run_epoch(session, train_model, train_data, train_model.train_op, True, train_epoch_size)
+            run_epoch(session, train_model, train_queue, train_model.train_op, True, train_epoch_size)
 
-            valid_perplexity = run_epoch(session, eval_model, valid_data, tf.no_op(), False, valid_epoch_size)
+            valid_perplexity = run_epoch(session, eval_model, eval_queue, tf.no_op(), False, valid_epoch_size)
 
             print "Epoch: {} Validation Perplexity: {:.3f}".format(i + 1, valid_perplexity)
 
         # 最后使用测试数据测试模型效果
-        test_perplexity = run_epoch(session, eval_model, test_data, tf.no_op(), False, test_epoch_size)
+        test_perplexity = run_epoch(session, eval_model, test_queue, tf.no_op(), False, test_epoch_size)
         print "Test Perplexity: {:.3f}".format(test_perplexity)
+
+        coord.request_stop()
+        coord.join(threads)
 
 if __name__ == '__main__':
     tf.app.run()
