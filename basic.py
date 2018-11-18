@@ -1,4 +1,5 @@
 # coding:utf-8
+import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -142,19 +143,45 @@ from tensorflow.examples.tutorials.mnist import input_data
 # saver.export_meta_graph("./model/test.ckpt.meta.json", as_text=True)
 
 
-# 前两个维度表示过滤器的尺寸, 第三个维度表示当前层的深度, 第四个维度表示过滤器的深度
-filter_weight = tf.get_variable('weights', [5, 5, 3, 16], initializer=tf.truncated_normal_initializer(stddev=0.1))
-biases = tf.get_variable('biases', [16], initializer=tf.constant_initializer(0.1))
+# # 前两个维度表示过滤器的尺寸, 第三个维度表示当前层的深度, 第四个维度表示过滤器的深度
+# filter_weight = tf.get_variable('weights', [5, 5, 3, 16], initializer=tf.truncated_normal_initializer(stddev=0.1))
+# biases = tf.get_variable('biases', [16], initializer=tf.constant_initializer(0.1))
+#
+# # 卷积层前向传播算法, 第一个参数为当前层节点矩阵, 这个矩阵是一个四维矩阵, 第一维对应一个输入batch, 如: input[0, :, :, :]表示第一张图片,
+# # 第二个参数为卷积层的权重, 第三个参数为不同维度上的步长, 因为卷积层的步长只对矩阵的长和宽有效, 所以第一维和最后一位一定是1,
+# # 最后一个参数为填充方式, SAME表示全0填充, VALID表示不填充
+# conv = tf.nn.conv2d(input, filter_weight, strides=[1, 1, 1, 1], padding='SAME')
+#
+# # tf.nn.bias_add提供一个方便的函数给每一个节点加上偏置项, 这里不能直接使用加法, 因为矩阵上不同位置上的节点都需要加上同样的偏置项
+# bias = tf.nn.bias_add(conv, biases)
+#
+# actived_conv = tf.nn.relu(bias)
+#
+# # 最大池化层前向传播算法, ksize为过滤器尺寸, 池化层过滤器不能跨不同输入样例或节点矩阵深度, 所以第一维和最后一位必须是1
+# pool = tf.nn.max_pool(actived_conv, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-# 卷积层前向传播算法, 第一个参数为当前层节点矩阵, 这个矩阵是一个四维矩阵, 第一维对应一个输入batch, 如: input[0, :, :, :]表示第一张图片,
-# 第二个参数为卷积层的权重, 第三个参数为不同维度上的步长, 因为卷积层的步长只对矩阵的长和宽有效, 所以第一维和最后一位一定是1,
-# 最后一个参数为填充方式, SAME表示全0填充, VALID表示不填充
-conv = tf.nn.conv2d(input, filter_weight, strides=[1, 1, 1, 1], padding='SAME')
 
-# tf.nn.bias_add提供一个方便的函数给每一个节点加上偏置项, 这里不能直接使用加法, 因为矩阵上不同位置上的节点都需要加上同样的偏置项
-bias = tf.nn.bias_add(conv, biases)
+X = [1, 2]
+state = [0.0, 0.0]
+# 分开定义不同输入部分的权重以方便操作
+w_cell_state = np.asarray([[0.1, 0.2], [0.3, 0.4]])
+w_cell_input = np.asarray([0.5, 0.6])
+b_cell = np.asarray([0.1, -0.1])
 
-actived_conv = tf.nn.relu(bias)
+# 定义用于输出的全连接层参数
+w_output = np.asarray([[1.0], [2.0]])
+b_output = 0.1
 
-# 最大池化层前向传播算法, ksize为过滤器尺寸, 池化层过滤器不能跨不同输入样例或节点矩阵深度, 所以第一维和最后一位必须是1
-pool = tf.nn.max_pool(actived_conv, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='SAME')
+# 按照时间顺序执行循环神经网络的前向传播过程
+for i in range(len(X)):
+    # 计算循环体中的全连接层神经网络
+    before_activation = np.dot(state, w_cell_state) + X[i] * w_cell_input + b_cell
+    state = np.tanh(before_activation)
+
+    # 根据当前时刻状态计算最终输出
+    final_output = np.dot(state, w_output) + b_output
+
+    # 输出每个时刻的信息
+    print "before activation: {}".format(before_activation)
+    print "state: {}".format(state)
+    print "output: {}".format(final_output)
