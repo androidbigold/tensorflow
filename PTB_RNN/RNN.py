@@ -96,13 +96,14 @@ class PTBModel(object):
         self.train_op = optimizer.apply_gradients(zip(grads, trainable_variables))
 
 # 使用给定的模型model在数据data上运行train_op并返回在全部数据上的perplexity值
-def run_epoch(session, model, data, train_op, output_log):
+def run_epoch(session, model, data, train_op, output_log, epoch_size):
     # 计算perplexity的辅助变量
     total_costs = 0.0
     iters = 0
     state = session.run(model.initial_state)
     # 使用当前数据训练或者测试模型
-    for step, (x, y) in enumerate(reader.ptb_producer(data, model.batch_size, model.num_steps)):
+    for step in range(epoch_size):
+        x, y = session.run(data)
         # 在当前batch上运行train_op并计算损失值, 交叉熵损失函数计算的就是下一个单词为给定单词的概率
         cost, state, _ = session.run([model.cost, model.final_state, train_op],
                                      {model.input_data: x, model.targets: y, model.initial_state: state})
@@ -119,6 +120,19 @@ def run_epoch(session, model, data, train_op, output_log):
 def main(_):
     # 获取原始数据
     train_data, valid_data, test_data, _ = reader.ptb_raw_data(DATA_PATH)
+
+    # 计算一个epoch需要训练的次数
+    train_data_len = len(train_data)
+    train_batch_len = train_data_len // TRAIN_BATCH_SIZE
+    train_epoch_size = (train_batch_len - 1) // TRAIN_NUM_STEP
+
+    valid_data_len = len(valid_data)
+    valid_batch_len = valid_data_len // EVAL_BATCH_SIZE
+    valid_epoch_size = (valid_batch_len - 1) // EVAL_NUM_STEP
+
+    test_data_len = len(test_data)
+    test_batch_len = test_data_len // EVAL_BATCH_SIZE
+    test_epoch_size = (test_batch_len - 1) // EVAL_NUM_STEP
 
     # 定义初始化函数
     initializer = tf.random_uniform_initializer(-0.05, 0.05)
@@ -137,14 +151,14 @@ def main(_):
         for i in range(NUM_EPOCH):
             print "In iteration: {}".format(i + 1)
 
-            run_epoch(session, train_model, train_data, train_model.train_op, True)
+            run_epoch(session, train_model, train_data, train_model.train_op, True, train_epoch_size)
 
-            valid_perplexity = run_epoch(session, eval_model, valid_data, tf.no_op(), False)
+            valid_perplexity = run_epoch(session, eval_model, valid_data, tf.no_op(), False, valid_epoch_size)
 
             print "Epoch: {} Validation Perplexity: {:.3f}".format(i + 1, valid_perplexity)
 
         # 最后使用测试数据测试模型效果
-        test_perplexity = run_epoch(session, eval_model, test_data, tf.no_op(), False)
+        test_perplexity = run_epoch(session, eval_model, test_data, tf.no_op(), False, test_epoch_size)
         print "Test Perplexity: {:.3f}".format(test_perplexity)
 
 if __name__ == '__main__':
