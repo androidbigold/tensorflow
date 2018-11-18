@@ -102,7 +102,7 @@ def run_epoch(session, model, data, train_op, output_log):
     iters = 0
     state = session.run(model.initial_state)
     # 使用当前数据训练或者测试模型
-    for step, (x, y) in enumerate(reader.ptb_iterator(data, model.batch_size, model.num_steps)):
+    for step, (x, y) in enumerate(reader.ptb_producer(data, model.batch_size, model.num_steps)):
         # 在当前batch上运行train_op并计算损失值, 交叉熵损失函数计算的就是下一个单词为给定单词的概率
         cost, state, _ = session.run([model.cost, model.final_state, train_op],
                                      {model.input_data: x, model.targets: y, model.initial_state: state})
@@ -131,7 +131,7 @@ def main(_):
         eval_model = PTBModel(False, EVAL_BATCH_SIZE, EVAL_NUM_STEP)
 
     with tf.Session() as session:
-        tf.initialize_all_variables().run()
+        tf.global_variables_initializer().run()
 
         # 使用训练数据训练模型
         for i in range(NUM_EPOCH):
