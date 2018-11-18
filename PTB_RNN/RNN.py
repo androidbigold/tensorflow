@@ -76,7 +76,7 @@ class PTBModel(object):
         loss = tf.nn.seq2seq.sequence_loss_by_example(
             [logits],  # 预测结果
             [tf.reshape(self.targets, [-1])],  # 期待的正确答案, 将[batch_size, num_steps]数组压缩成一维数组
-            [tf.ones([batch_size * num_steps], dtyep=tf.float32)]  # 损失的权重, 在这里所有的权重都为1, 也就是说不同batch和不同时刻的重要程度是一样的
+            [tf.ones([batch_size * num_steps], dtype=tf.float32)]  # 损失的权重, 在这里所有的权重都为1, 也就是说不同batch和不同时刻的重要程度是一样的
         )
 
         # 计算每个batch的平均损失
