@@ -50,8 +50,8 @@ regressor = learn.Estimator(model_fn=lstm_model)
 # 用正弦函数生成训练数据和测试数据
 test_start = TRAINING_EXAMPLES * SAMPLE_GAP
 test_end = (TRAINING_EXAMPLES + TESTING_EXAMPLES) * SAMPLE_GAP
-train_X, train_y = generate_data(np.sin(np.linespace(0, test_start, TRAINING_EXAMPLES, dtype=np.float32)))
-test_X, test_y = generate_data(np.sin(np.linespace(test_start, test_end, TESTING_EXAMPLES, dtype=np.float32)))
+train_X, train_y = generate_data(np.sin(np.linspace(0, test_start, TRAINING_EXAMPLES, dtype=np.float32)))
+test_X, test_y = generate_data(np.sin(np.linspace(test_start, test_end, TESTING_EXAMPLES, dtype=np.float32)))
 
 # 调用fit函数训练模型
 regressor.fit(train_X, train_y, batch_size=BATCH_SIZE, steps=TRAINING_STEPS)
